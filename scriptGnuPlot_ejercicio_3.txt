@@ -1,0 +1,8 @@
+set key left top; set xlabel "iteraciones"; set ylabel "tiempo (seg.)"
+plot "comparativa_serie_segmentada.txt" using 1:2 title "fractura de 2 terminos" with lines, \
+"comparativa_serie_segmentada.txt" using 1:3 title "fractura de 3 terminos" with lines, \
+"comparativa_serie_segmentada.txt" using 1:4 title "fractura de 4 terminos" with lines, \
+"comparativa_serie_segmentada.txt" using 1:5 title "fractura de 5 terminos" with lines, \
+"comparativa_serie_segmentada.txt" using 1:6 title "fractura de 6 terminos" with lines, \
+"comparativa_serie_segmentada.txt" using 1:7 title "fractura de 10 terminos" with lines, \
+
