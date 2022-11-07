@@ -39,15 +39,28 @@ void PromedioPixeles(long int segmentSize, int partialX[], int partialY[], int p
         z_index++;
     }
 
-    // hacer otro loop para llenado de Xaverage y Yaverage
-    for (int y_index = 0; y_index < newSize; y_index++)
+    /*el tamaño de y_index va a cambiar. De momento es 64*/
+    int x_index = 0, y_index = 0;
+    for (int y_value = 1; y_value <= 64; y_value++)
     {
-        for (int x_index = 0; x_index < newSize; x_index++)
+        for (int x_value = 1; x_value <= 256; x_value++)
         {
-            Xaverage[x_index] = x_index + 1;
-            Yaverage[y_index] = y_index + 1;
+            Xaverage[x_index] = x_value;
+            Yaverage[y_index] = y_value;
+            x_index++; y_index++;
         }
     }
+
+    // prueba para escribir el resultado en un archivo .txt
+    FILE *image_segment;
+    image_segment = fopen("segmento_prueba.txt", "w");
+
+    for (int pixel = 0; pixel < newSize; pixel++)
+    {
+        fprintf(image_segment, "%d %d %.3f\n", Xaverage[pixel], Yaverage[pixel], Zaverage[pixel]);
+    }
+
+    fclose(image_segment);
 }
 
 // metodo elegido para particionar el dominio : horizontal
