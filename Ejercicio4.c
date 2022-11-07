@@ -19,7 +19,8 @@ void PromedioPixeles(long int segmentSize, int partialX[], int partialY[], int p
     /*de momento sera el nuevo tamaño considerando una
     particion de 4 segmentos de imagen*/
     int newSize = 256*64;
-    float Xaverage[newSize], Yaverage[newSize], Zaverage[newSize];
+    int Xaverage[newSize], Yaverage[newSize];
+    float Zaverage[newSize];
     float average = 0.0;
     int intensityBlock[64];  // bloque de 64 intensidades
 
@@ -39,7 +40,8 @@ void PromedioPixeles(long int segmentSize, int partialX[], int partialY[], int p
         z_index++;
     }
 
-    /*el tamaño de y_index va a cambiar. De momento es 64*/
+    /*el tamaño de y_index va a cambiar. De momento es 64
+    y todo el segmento comienza en x = y = 0*/
     int x_index = 0, y_index = 0;
     for (int y_value = 1; y_value <= 64; y_value++)
     {
@@ -90,14 +92,29 @@ int main(int argc, char *argv[])
     }
 
     fclose(originalImageData);
+    err = MPI_Finalize();
 
+    long int segmentSize = 2048*512;
+    int partialX[segmentSize], partialY[segmentSize], partialZ[segmentSize];
 
+    // se llenan valores parciales para la prueba
+    for (int pix = 0; pix < segmentSize; pix++)
+    {
+        partialX[pix] = x[pix];
+        partialY[pix] = y[pix];
+        partialZ[pix] = intensity[pix];
+    }
 
+    printf("\ncalculando...");
+    PromedioPixeles(segmentSize, partialX, partialY, partialZ);
+    printf("\nListo! revise los resultados.\n");
+
+/*
     for (int i=0; i<Number_of_Processes; i++)
     {
         if (i == task)
         {
 
         }
-    }
+    }*/
 }
