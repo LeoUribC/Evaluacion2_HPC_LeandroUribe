@@ -13,20 +13,39 @@ float Promedio(int a[], int n)
     return (float) sum / n;
 }
 
+// el parametro segmentSize de momento sera 2048x512
 void PromedioPixeles(long int segmentSize, int partialX[], int partialY[], int partialZ[])
 {
     /*de momento sera el nuevo tamaño considerando una
     particion de 4 segmentos de imagen*/
     int newSize = 256*64;
-    float Xaverage[newSize], Yaverage[2], Zaverage[2];
+    float Xaverage[newSize], Yaverage[newSize], Zaverage[newSize];
+    float average = 0.0;
+    int intensityBlock[64];  // bloque de 64 intensidades
 
-    int i = 0, bloque;
-    for (bloque=64; bloque<segmentSize; bloque+=64)
+    /*se calculan los promedios de cada bloque de 64 (8x8) intensidades*/
+    int z_i = 0, z_index = 0, bloque;
+    for (bloque = 64; bloque < segmentSize; bloque += 64)
     {
-        while (i < bloque)
+        for (int i=0; i<64; i++)
         {
+            // array 'slicing' de partialZ a 64 elementos
+            intensityBlock[i] = partialZ[z_i];
+            z_i++;
+        }
+        // promedio de cada bloque de 64 intensidades
+        average = Promedio(intensityBlock, 64);
+        Zaverage[z_index] = average;  // para aprovechar el iterador bloque
+        z_index++;
+    }
 
-            i++;
+    // hacer otro loop para llenado de Xaverage y Yaverage
+    for (int y_index = 0; y_index < newSize; y_index++)
+    {
+        for (int x_index = 0; x_index < newSize; x_index++)
+        {
+            Xaverage[x_index] = x_index + 1;
+            Yaverage[y_index] = y_index + 1;
         }
     }
 }
