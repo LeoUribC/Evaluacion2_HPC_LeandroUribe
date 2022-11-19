@@ -2,9 +2,10 @@
 #include<string.h>
 #include<math.h>
 #include<time.h>
+#include<stdlib.h>
 //#include<mpi.h>  // este .c no implementa paralelizacion
 
-float Promedio(int a[], int n)
+float Promedio(float a[], int n)
 {
     int sum = 0;
     for (int i = 0; i < n; i++)
@@ -14,15 +15,19 @@ float Promedio(int a[], int n)
 }
 
 // el parametro segmentSize de momento sera 2048x512
-void PromedioPixeles(int segmentSize, int partialX[], int partialY[], int partialZ[])
+void PromedioPixeles(int segmentSize, float partialX[], float partialY[], float partialZ[])
 {
     /*de momento sera el nuevo tamaño considerando una
     particion de 4 segmentos de imagen*/
     int newSize = 256*64;
-    int Xaverage[newSize], Yaverage[newSize];
-    float Zaverage[newSize];
+    float *Xaverage, *Yaverage, *Zaverage;
+
+    Xaverage = (float *) malloc( newSize*sizeof(float) );
+    Yaverage = (float *) malloc( newSize*sizeof(float) );
+    Zaverage = (float *) malloc( newSize*sizeof(float) );
+
     float average = 0.0;
-    int intensityBlock[64];  // bloque de 64 intensidades
+    float intensityBlock[64];  // bloque de 64 intensidades
 
     /*se calculan los promedios de cada bloque de 64 (8x8) intensidades*/
     int z_i = 0, z_index = 0, bloque;
@@ -59,7 +64,7 @@ void PromedioPixeles(int segmentSize, int partialX[], int partialY[], int partia
 
     for (int pixel = 0; pixel < newSize; pixel++)
     {
-        fprintf(image_segment, "%d %d %.3f\n", Xaverage[pixel], Yaverage[pixel], Zaverage[pixel]);
+        fprintf(image_segment, "%.3f %.3f %.3f\n", Xaverage[pixel], Yaverage[pixel], Zaverage[pixel]);
     }
 
     fclose(image_segment);
@@ -69,9 +74,13 @@ void PromedioPixeles(int segmentSize, int partialX[], int partialY[], int partia
 // metodo elegido para particionar el dominio : horizontal
 void main()
 {
-    int originalImageSize = 2048*512; // por probar
+    int originalImageSize = 2048*2048; // por probar
+    float *x, *y, *intensity;
     //int Number_of_Processes, task;
-    int x[originalImageSize], y[originalImageSize], intensity[originalImageSize];
+
+    x = (float *) malloc( originalImageSize*sizeof(float) );
+    y = (float *) malloc( originalImageSize*sizeof(float) );
+    intensity = (float *) malloc( originalImageSize*sizeof(float) );
 
     FILE *originalImageData;
     originalImageData = fopen("imagen_0001.pix", "r");
@@ -79,13 +88,16 @@ void main()
     // lee los datos
     for (int pixel = 0; pixel < originalImageSize; pixel++)
     {
-        fscanf(originalImageData, "%d. %d.  %d.\n", &x[pixel], &y[pixel], &intensity[pixel]);
+        fscanf(originalImageData, "%f %f %f\n", &x[pixel], &y[pixel], &intensity[pixel]);
     }
 
     fclose(originalImageData);
 
-    int segmentSize = 2048*512;
-    int partialX[segmentSize], partialY[segmentSize], partialZ[segmentSize];
+    int segmentSize = 2048*512;  // para probar el primer segmento de imgen
+    float *partialX, *partialY, *partialZ;
+    partialX = (float *) malloc( segmentSize*sizeof(float) );
+    partialY = (float *) malloc( segmentSize*sizeof(float) );
+    partialZ = (float *) malloc( segmentSize*sizeof(float) );
 
     // se llenan valores parciales para la prueba
     for (int pix = 0; pix < segmentSize; pix++)
